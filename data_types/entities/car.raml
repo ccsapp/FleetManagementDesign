@@ -1,0 +1,9 @@
+#%RAML 1.0 DataType
+description: Process Entity Car
+
+type: !include car_base.raml
+properties:
+  technicalSpecifications: !include value_objects/technicalSpecifications.raml
+  dynamicCarData: !include value_objects/dynamicCarData.raml
+
+examples: !include car_example.raml
