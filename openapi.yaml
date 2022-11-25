@@ -255,6 +255,8 @@ components:
       description: Data that specifies wether an object is locked or unlocked
     fleetID:
       type: string
+      pattern: '^[a-zA-Z0-9]{8}$'
+      example: xk48jpgz
       description: Unique identification of a car fleet
     vin:
       type: string
