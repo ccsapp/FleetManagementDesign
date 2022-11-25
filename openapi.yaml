@@ -3,11 +3,11 @@ info:
   title: P-FleetManagement
   version: 1.0.0
   description: Process API 1.0.0 providing the functionality for the capability Management of the Fleet
-servers: []
+servers: [ ]
 paths:
   /fleets/{fleetID}/cars:
     parameters:
-        - $ref: '#/components/parameters/fleetID'
+      - $ref: '#/components/parameters/fleetIDParam'
     get:
       summary: Get Overview of All Cars Assigned to the Given Fleet
       operationId: getCarsInFleet
@@ -26,8 +26,8 @@ paths:
           $ref: '#/components/responses/fleetNotFound'
   /fleets/{fleetID}/cars/{vin}:
     parameters:
-      - $ref: '#/components/parameters/fleetID'
-      - $ref: '#/components/parameters/vin'
+      - $ref: '#/components/parameters/fleetIDParam'
+      - $ref: '#/components/parameters/vinParam'
     get:
       summary: Get Status of the Car With the Given VIN Assigned to the Given Fleet
       operationId: getCar
@@ -52,11 +52,11 @@ paths:
       operationId: addCarToFleet
       responses:
         '200':
-          description: Successful operation 
+          description: Successful operation
           content:
-              application/json:
-                schema:
-                  $ref: '#/components/schemas/car_base'
+            application/json:
+              schema:
+                $ref: '#/components/schemas/car_base'
         '204':
           $ref: '#/components/responses/carAlreadyAssignedToFleet'
         '404':
@@ -83,7 +83,7 @@ paths:
                 oneOf:
                   - $ref: '#/components/responses/fleetIDInvalid'
                   - $ref: '#/components/responses/vinInvalid'
-    
+
 components:
   schemas:
     car_base:
@@ -115,7 +115,7 @@ components:
             dynamicData:
               $ref: '#/components/schemas/dynamicData'
       description: A specific type of vehicle
-    technicalSpecification: 
+    technicalSpecification:
       type: object
       properties:
         color:
@@ -242,14 +242,16 @@ components:
         doorsLockState:
           $ref: '#/components/schemas/lockState'
         engineState:
+          type: string
           enum:
-          - 'ON'
-          - 'OFF'
+            - 'ON'
+            - 'OFF'
       description: Data that changes during a car's operation
     lockState:
+      type: string
       enum:
-      - LOCKED
-      - UNLOCKED
+        - LOCKED
+        - UNLOCKED
       description: Data that specifies wether an object is locked or unlocked
     fleetID:
       type: string
@@ -273,7 +275,7 @@ components:
     removed:
       description: The car was removed successfully
   parameters:
-    vin:
+    vinParam:
       in: path
       name: vin
       required: true
@@ -282,7 +284,7 @@ components:
       style: simple
       schema:
         $ref: '#/components/schemas/vin'
-    fleetID:
+    fleetIDParam:
       in: path
       name: fleetID
       required: true
@@ -290,9 +292,9 @@ components:
       style: simple
       schema:
         $ref: '#/components/schemas/fleetID'
-  examples: {}
-  requestBodies: {}
-  headers: {}
-  securitySchemes: {}
-  links: {}
-  callbacks: {}
+  examples: { }
+  requestBodies: { }
+  headers: { }
+  securitySchemes: { }
+  links: { }
+  callbacks: { }
