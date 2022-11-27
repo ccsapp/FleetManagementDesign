@@ -47,6 +47,7 @@ paths:
                 oneOf:
                   - $ref: '#/components/responses/fleetIDInvalid'
                   - $ref: '#/components/responses/vinInvalid'
+                  - $ref: '#/components/responses/carNotAssignedtoFleet'
     put:
       summary: Add a Car to the Fleet
       operationId: addCarToFleet
@@ -272,6 +273,8 @@ components:
       description: The fleetID has an invalid format
     fleetNotFound:
       description: The specified car was not found
+    carNotAssignedtoFleet:
+      description: The specified car was not assigned to the specified fleet
     carAlreadyAssignedToFleet:
       description: The specified car was already assigned to the specified fleet
     removed:
