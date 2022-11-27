@@ -38,6 +38,15 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/car'
+        "400":
+          description: invalid fleet or vin format
+          content:
+            application/json:
+              example: The fleetID has an invalid format
+              schema:
+                oneOf:
+                  - $ref: '#/components/responses/fleetIDInvalid'
+                  - $ref: '#/components/responses/vinInvalid'
         '404':
           description: invalid fleet or vin
           content:
@@ -45,8 +54,8 @@ paths:
               example: Could not find the given fleet
               schema:
                 oneOf:
-                  - $ref: '#/components/responses/fleetIDInvalid'
-                  - $ref: '#/components/responses/vinInvalid'
+                  - $ref: '#/components/responses/fleetNotFound'
+                  - $ref: '#/components/responses/carNotFound'
                   - $ref: '#/components/responses/carNotAssignedtoFleet'
     put:
       summary: Add a Car to the Fleet
@@ -60,6 +69,15 @@ paths:
                 $ref: '#/components/schemas/car_base'
         '204':
           $ref: '#/components/responses/carAlreadyAssignedToFleet'
+        "400":
+          description: invalid fleet or vin format
+          content:
+            application/json:
+              example: The fleetID has an invalid format
+              schema:
+                oneOf:
+                  - $ref: '#/components/responses/fleetIDInvalid'
+                  - $ref: '#/components/responses/vinInvalid'
         '404':
           description: invalid fleet or vin
           content:
@@ -67,14 +85,24 @@ paths:
               example: Could not find the given fleet
               schema:
                 oneOf:
-                  - $ref: '#/components/responses/fleetIDInvalid'
-                  - $ref: '#/components/responses/vinInvalid'
+                  - $ref: '#/components/responses/fleetNotFound'
+                  - $ref: '#/components/responses/carNotFound'
+                  - $ref: '#/components/responses/carNotAssignedtoFleet'
     delete:
       summary: Remove Car From Fleet
       operationId: removeCar
       responses:
         '204':
           $ref: '#/components/responses/removed'
+        "400":
+          description: invalid fleet or vin format
+          content:
+            application/json:
+              example: The fleetID has an invalid format
+              schema:
+                oneOf:
+                  - $ref: '#/components/responses/fleetIDInvalid'
+                  - $ref: '#/components/responses/vinInvalid'
         '404':
           description: invalid fleet or vin
           content:
@@ -82,8 +110,9 @@ paths:
               example: Could not find the given fleet
               schema:
                 oneOf:
-                  - $ref: '#/components/responses/fleetIDInvalid'
-                  - $ref: '#/components/responses/vinInvalid'
+                  - $ref: '#/components/responses/fleetNotFound'
+                  - $ref: '#/components/responses/carNotFound'
+                  - $ref: '#/components/responses/carNotAssignedtoFleet'
 
 components:
   schemas:
@@ -272,7 +301,7 @@ components:
     fleetIDInvalid:
       description: The fleetID has an invalid format
     fleetNotFound:
-      description: The specified car was not found
+      description: The specified fleet was not found
     carNotAssignedtoFleet:
       description: The specified car was not assigned to the specified fleet
     carAlreadyAssignedToFleet:
