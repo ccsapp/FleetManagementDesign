@@ -39,7 +39,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/car'
         "400":
-          description: invalid fleet or vin format
+          description: The given fleetID or VIN is invalid.
           content:
             application/json:
               example: The fleetID has an invalid format
@@ -48,7 +48,7 @@ paths:
                   - $ref: '#/components/responses/fleetIDInvalid'
                   - $ref: '#/components/responses/vinInvalid'
         '404':
-          description: invalid fleet or vin
+          description: The given fleetID or VIN does not exist, or the car is not assigned to the given fleet.
           content:
             application/json:
               example: Could not find the given fleet
@@ -56,13 +56,13 @@ paths:
                 oneOf:
                   - $ref: '#/components/responses/fleetNotFound'
                   - $ref: '#/components/responses/carNotFound'
-                  - $ref: '#/components/responses/carNotAssignedtoFleet'
+                  - $ref: '#/components/responses/carNotAssignedToFleet'
     put:
       summary: Add a Car to the Fleet
       operationId: addCarToFleet
       responses:
         '200':
-          description: Successful operation
+          description: The operation was successful.
           content:
             application/json:
               schema:
@@ -70,7 +70,7 @@ paths:
         '204':
           $ref: '#/components/responses/carAlreadyAssignedToFleet'
         "400":
-          description: invalid fleet or vin format
+          description: The given fleetID or VIN is invalid.
           content:
             application/json:
               example: The fleetID has an invalid format
@@ -79,7 +79,7 @@ paths:
                   - $ref: '#/components/responses/fleetIDInvalid'
                   - $ref: '#/components/responses/vinInvalid'
         '404':
-          description: invalid fleet or vin
+          description: The given fleetID or VIN does not exist, or the car is not assigned to the given fleet.
           content:
             application/json:
               example: Could not find the given fleet
@@ -87,7 +87,7 @@ paths:
                 oneOf:
                   - $ref: '#/components/responses/fleetNotFound'
                   - $ref: '#/components/responses/carNotFound'
-                  - $ref: '#/components/responses/carNotAssignedtoFleet'
+                  - $ref: '#/components/responses/carNotAssignedToFleet'
     delete:
       summary: Remove Car From Fleet
       operationId: removeCar
@@ -95,7 +95,7 @@ paths:
         '204':
           $ref: '#/components/responses/removed'
         "400":
-          description: invalid fleet or vin format
+          description: The given fleetID or VIN is invalid.
           content:
             application/json:
               example: The fleetID has an invalid format
@@ -104,7 +104,7 @@ paths:
                   - $ref: '#/components/responses/fleetIDInvalid'
                   - $ref: '#/components/responses/vinInvalid'
         '404':
-          description: invalid fleet or vin
+          description: The given fleetID or VIN does not exist, or the car is not assigned to the given fleet.
           content:
             application/json:
               example: Could not find the given fleet
@@ -112,12 +112,17 @@ paths:
                 oneOf:
                   - $ref: '#/components/responses/fleetNotFound'
                   - $ref: '#/components/responses/carNotFound'
-                  - $ref: '#/components/responses/carNotAssignedtoFleet'
+                  - $ref: '#/components/responses/carNotAssignedToFleet'
 
 components:
   schemas:
     car_base:
       type: object
+      required:
+        - vin
+        - brand
+        - model
+        - productionDate
       properties:
         vin:
           $ref: '#/components/schemas/vin'
@@ -133,12 +138,15 @@ components:
           type: string
           format: date
           example: "2017-07-21"
-          description: Data that specifies the official date the vehicle was declared to have exited pro- duction by the manufacturer.
+          description: Data that specifies the official date the vehicle was declared to have exited production by the manufacturer.
       description: Overview of a car
     car:
       allOf:
         - $ref: '#/components/schemas/car_base'
         - type: object
+          required:
+            - technicalSpecification
+            - dynamicData
           properties:
             technicalSpecification:
               $ref: '#/components/schemas/technicalSpecification'
@@ -147,6 +155,19 @@ components:
       description: A specific type of vehicle
     technicalSpecification:
       type: object
+      required:
+        - color
+        - weight
+        - trunkVolume
+        - engine
+        - transmission
+        - tire
+        - numberOfSeats
+        - numberOfDoors
+        - fuel
+        - fuelCapacity
+        - consumption
+        - emissions
       properties:
         color:
           type: string
@@ -162,6 +183,9 @@ components:
           description: Data on the physical volume of the trunk in liters
         engine:
           type: object
+          required:
+            - type
+            - power
           properties:
             type:
               type: string
@@ -181,6 +205,9 @@ components:
           description: A physical unit responsible for managing the conversion rate of the engine (can be automated or manually operated)
         tire:
           type: object
+          required:
+            - manufacturer
+            - type
           properties:
             manufacturer:
               type: string
@@ -217,6 +244,10 @@ components:
           description: Data that specifies the amount of fuel that can be carried with the car
         consumption:
           type: object
+          required:
+            - city
+            - overland
+            - combined
           properties:
             city:
               type: number
@@ -233,23 +264,32 @@ components:
           description: Data that specifies the amount of fuel consumed during car operation in units per 100 kilometers
         emissions:
           type: object
+          required:
+            - city
+            - overland
+            - combined
           properties:
             city:
               type: number
               example: 168
-              description: "Data that specifies the amount of emis- sions when driving within the city in: g CO2 / km"
+              description: "Data that specifies the amount of emissions when driving within the city in: g CO2 / km"
             overland:
               type: number
               example: 122
-              description: "Data that specifies the amount of emis- sions when driving outside of a city in: g CO2 / km"
+              description: "Data that specifies the amount of emissions when driving outside of a city in: g CO2 / km"
             combined:
               type: number
               example: 137
               description: "Data that specifies the combined amount of emissions in: g CO2 / km. The combination is done by the manufacturer according to an industry-specific standard"
-          
           description: Data that specifies the CO2 emitted by a car during operation in gram per kilometer
     dynamicData:
       type: object
+      required:
+        - fuelLevelPercentage
+        - position
+        - trunkLockState
+        - doorsLockState
+        - engineState
       properties:
         fuelLevelPercentage:
           type: integer
@@ -257,6 +297,9 @@ components:
           description: Data that specifies the relation of remaining fuelCapacity to the maximum fuelCapacity in percentage
         position:
           type: object
+          required:
+            - latitude
+            - longitude
           properties:
             latitude:
               type: number
@@ -282,7 +325,7 @@ components:
       enum:
         - LOCKED
         - UNLOCKED
-      description: Data that specifies wether an object is locked or unlocked
+      description: Data that specifies whether an object is locked or unlocked
     fleetID:
       type: string
       pattern: '^[a-zA-Z0-9]{8}$'
@@ -302,7 +345,7 @@ components:
       description: The fleetID has an invalid format
     fleetNotFound:
       description: The specified fleet was not found
-    carNotAssignedtoFleet:
+    carNotAssignedToFleet:
       description: The specified car was not assigned to the specified fleet
     carAlreadyAssignedToFleet:
       description: The specified car was already assigned to the specified fleet
