@@ -1,8 +1,8 @@
 openapi: 3.0.0
 info:
-  title: P-FleetManagement
+  title: FleetManagement
   version: 1.0.0
-  description: Process API 1.0.0 providing the functionality for the capability Management of the Fleet
+  description: Application Microservice API 1.0.0 providing the functionality for the capability Management of the Fleet
 servers: [ ]
 paths:
   /fleets/{fleetID}/cars:
@@ -19,11 +19,11 @@ paths:
               schema:
                 type: array
                 items:
-                  $ref: '#/components/schemas/car_base'
-        "400":
-          $ref: '#/components/responses/fleetIDInvalid'
+                  $ref: '#/components/schemas/carBase'
+        '400':
+          $ref: '#/components/responses/fleetIdInvalid'
         '404':
-          $ref: '#/components/responses/fleetNotFound'
+          $ref: '#/components/responses/carFleetRelationNotFound'
   /fleets/{fleetID}/cars/{vin}:
     parameters:
       - $ref: '#/components/parameters/fleetIDParam'
@@ -38,25 +38,10 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/car'
-        "400":
-          description: The given fleetID or VIN is invalid.
-          content:
-            application/json:
-              example: The fleetID has an invalid format
-              schema:
-                oneOf:
-                  - $ref: '#/components/responses/fleetIDInvalid'
-                  - $ref: '#/components/responses/vinInvalid'
+        '400':
+          $ref: '#/components/responses/fleetIdOrVinInvalid'
         '404':
-          description: The given fleetID or VIN does not exist, or the car is not assigned to the given fleet.
-          content:
-            application/json:
-              example: Could not find the given fleet
-              schema:
-                oneOf:
-                  - $ref: '#/components/responses/fleetNotFound'
-                  - $ref: '#/components/responses/carNotFound'
-                  - $ref: '#/components/responses/carNotAssignedToFleet'
+          $ref: '#/components/responses/carFleetRelationNotFound'
     put:
       summary: Add a Car to the Fleet
       operationId: addCarToFleet
@@ -66,57 +51,27 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/car_base'
+                $ref: '#/components/schemas/carBase'
         '204':
           $ref: '#/components/responses/carAlreadyAssignedToFleet'
-        "400":
-          description: The given fleetID or VIN is invalid.
-          content:
-            application/json:
-              example: The fleetID has an invalid format
-              schema:
-                oneOf:
-                  - $ref: '#/components/responses/fleetIDInvalid'
-                  - $ref: '#/components/responses/vinInvalid'
+        '400':
+          $ref: '#/components/responses/fleetIdOrVinInvalid'
         '404':
-          description: The given fleetID or VIN does not exist, or the car is not assigned to the given fleet.
-          content:
-            application/json:
-              example: Could not find the given fleet
-              schema:
-                oneOf:
-                  - $ref: '#/components/responses/fleetNotFound'
-                  - $ref: '#/components/responses/carNotFound'
-                  - $ref: '#/components/responses/carNotAssignedToFleet'
+            $ref: '#/components/responses/carFleetRelationNotFound'
     delete:
       summary: Remove Car From Fleet
       operationId: removeCar
       responses:
         '204':
           $ref: '#/components/responses/removed'
-        "400":
-          description: The given fleetID or VIN is invalid.
-          content:
-            application/json:
-              example: The fleetID has an invalid format
-              schema:
-                oneOf:
-                  - $ref: '#/components/responses/fleetIDInvalid'
-                  - $ref: '#/components/responses/vinInvalid'
+        '400':
+          $ref: '#/components/responses/fleetIdOrVinInvalid'
         '404':
-          description: The given fleetID or VIN does not exist, or the car is not assigned to the given fleet.
-          content:
-            application/json:
-              example: Could not find the given fleet
-              schema:
-                oneOf:
-                  - $ref: '#/components/responses/fleetNotFound'
-                  - $ref: '#/components/responses/carNotFound'
-                  - $ref: '#/components/responses/carNotAssignedToFleet'
+          $ref: '#/components/responses/carFleetRelationNotFound'
 
 components:
   schemas:
-    car_base:
+    carBase:
       type: object
       required:
         - vin
@@ -142,7 +97,7 @@ components:
       description: Overview of a car
     car:
       allOf:
-        - $ref: '#/components/schemas/car_base'
+        - $ref: '#/components/schemas/carBase'
         - type: object
           required:
             - technicalSpecification
@@ -336,21 +291,53 @@ components:
       pattern: '^[A-HJ-NPR-Z0-9]{13}[0-9]{4}$'
       example: WDD1690071J236589
       description: A Vehicle Identification Number (VIN) which uniquely identifies a Vehicle
+
+    # -- Errors --
+    genericError:
+      type: object
+      required:
+        - message
+      properties:
+        message:
+          type: string
+          example: "An error occurred"
+          description: A message that describes the error
+    carFleetRelationError:
+      type: object
+      required:
+        - message
+      properties:
+        message:
+          type: string
+          enum: [
+            "The specified car was not found",
+            "The specified fleet was not found",
+            "The specified car is not assigned to the specified fleet"
+          ]
+
   responses:
-    vinInvalid:
-      description: The vin has an invalid format
-    carNotFound:
-      description: The specified car was not found
-    fleetIDInvalid:
-      description: The fleetID has an invalid format
-    fleetNotFound:
-      description: The specified fleet was not found
-    carNotAssignedToFleet:
-      description: The specified car was not assigned to the specified fleet
+    fleetIdInvalid:
+      description: The fleetID has an invalid format. A technical error message useful for debugging is provided in the response body.
+      content:
+          application/json:
+            schema:
+                $ref: '#/components/schemas/genericError'
+    fleetIdOrVinInvalid:
+      description: The fleetID or VIN has an invalid format. A technical error message useful for debugging is provided in the response body.
+      content:
+        application/json:
+            schema:
+                $ref: '#/components/schemas/genericError'
+    carFleetRelationNotFound:
+      description: The given fleetID or VIN does not exist, or the car is not assigned to the given fleet. Details are provided in form of a fixed error message.
+      content:
+        application/json:
+            schema:
+                $ref: '#/components/schemas/carFleetRelationError'
     carAlreadyAssignedToFleet:
-      description: The specified car was already assigned to the specified fleet
+      description: The specified car is already assigned to the specified fleet.
     removed:
-      description: The car was removed successfully
+      description: The car was removed successfully.
   parameters:
     vinParam:
       in: path
@@ -369,9 +356,3 @@ components:
       style: simple
       schema:
         $ref: '#/components/schemas/fleetID'
-  examples: { }
-  requestBodies: { }
-  headers: { }
-  securitySchemes: { }
-  links: { }
-  callbacks: { }
