@@ -1,8 +1,8 @@
 openapi: 3.0.0
 info:
   title: FleetManagement
-  version: 1.0.0
-  description: Application Microservice API 1.0.0 providing the functionality for the capability Management of the Fleet
+  version: 2.1.0
+  description: Application Microservice API 2.1.0 providing the functionality for the capability Management of the Fleet
 servers: [ ]
 paths:
   /fleets/{fleetID}/cars:
@@ -107,6 +107,8 @@ components:
               $ref: '#/components/schemas/technicalSpecification'
             dynamicData:
               $ref: '#/components/schemas/dynamicData'
+            rental:
+              $ref: '#/components/schemas/rental'
       description: A specific type of vehicle
     technicalSpecification:
       type: object
@@ -281,6 +283,58 @@ components:
         - LOCKED
         - UNLOCKED
       description: Data that specifies whether an object is locked or unlocked
+    rental:
+      type: object
+      required:
+        - id
+        - active
+        - customer
+        - rentalPeriod
+      properties:
+        id:
+          $ref: '#/components/schemas/rentalId'
+        active:
+          $ref: '#/components/schemas/active'
+        customer:
+          $ref: '#/components/schemas/customer'
+        rentalPeriod:
+          $ref: '#/components/schemas/timePeriod'
+      description: Rental information
+    customer:
+      type: object
+      required:
+        - customerId
+      properties:
+        customerId:
+          $ref: '#/components/schemas/customerId'
+      description: A customer
+    date-time:
+      type: string
+      format: date-time
+      example: "2017-07-21T17:32:28Z"
+      description: Data that specifies a point in time
+    timePeriod:
+      type: object
+      description: A period of time
+      properties:
+        startDate:
+          $ref: '#/components/schemas/date-time'
+        endDate:
+          $ref: '#/components/schemas/date-time'
+    active:
+      type: boolean
+      example: true
+      description: Describes whether this rental is active
+    rentalId:
+      type: string
+      pattern: '^[a-zA-Z0-9]{8}$'
+      example: rZ6IIwcD
+      description: Unique identification of a rental
+    customerId:
+      type: string
+      pattern: '^[a-zA-Z0-9]{8}$'
+      example: d9ChwOvI
+      description: Unique identification of a customer
     fleetID:
       type: string
       pattern: '^[a-zA-Z0-9]{8}$'
